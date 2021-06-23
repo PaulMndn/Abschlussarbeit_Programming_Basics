@@ -1,5 +1,4 @@
 import logging
-from re import A
 from Bio import SeqIO, Entrez
 import pathlib
 
@@ -159,7 +158,7 @@ class biologic:
             if len(codon) < 3:
                 # No complete codon left
                 continue
-            
+
             try: 
                 peptid.append(self.codon_table[codon])
             except KeyError:
