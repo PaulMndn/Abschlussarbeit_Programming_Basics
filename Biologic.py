@@ -1,3 +1,5 @@
+import logging
+log = logging.getLogger(__name__)
 
 def get_bonds():
     """ Gibt pro Paar die Anzahl der Wasserstoffbrücken zurück.
@@ -5,19 +7,41 @@ def get_bonds():
     """
 
 class biologic:
+    ALPHABETS = {
+        "dna": "ACTG_",
+        "rna": "AUGC_",
+        "protein": "ACDEFGHIKLMNPQRSTVWY_"
+    }
 
     def __init__(self):
         """ Konstruktor. Falls nötig, können hier Voreinstellungen gemacht werden. """
 
     def set_dna(self,dna):
         """ Setze die interne DNA-Sequenz. Aufgabe 1"""
+        self.dna = dna.upper()
+        log.info(f"New DNA entered: {dna}")
 
     def validate_dna(self):
-        """ Überprüfe die intern gespeicherte DNA. Aufgabe 1"""
+        """ Überprüfe die intern gespeicherte DNA. Aufgabe 1
+
+        Checks if all letters of DNA sequence are valid according to 
+        the alphabet.
+        """
+        if all(i in self.ALPHABETS['dna'] for i in self.dna):
+            log.debug(f'DNA is valid. DNA: {self.dna}')
+            return True
+        else:
+            log.warning(f"DNA is invalid. DNA: {self.dna}")
+            return False
+
 
     def get_rna(self):
         """ Die intern gespeicherte RNA wird zurück gegeben. Aufgabe 1
-        Ergebnis: die gespeicherte RNA-Sequenz"""
+        
+        Returns:
+            RNA sequence as string.
+        """
+        return self.rna
  
 
     def read_fasta_file(self, name):
