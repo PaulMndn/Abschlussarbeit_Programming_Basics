@@ -8,6 +8,30 @@ from tkinter import filedialog as fd
 
 from drawing import *
 from Biologic import *
+import logging
+import time
+
+# initiate logging
+start_time = time.strftime("%Y%m%d_%H%M%S")
+logging.basicConfig(
+    filename=f"./log/{start_time}.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s - %(name)s: %(message)s"
+)
+log = logging.getLogger()
+# log.setLevel(logging.DEBUG)
+log.info("Application started.")
+
+# def _switch_gui_logging_level(menu:tk.Menu):
+#     if logging.root.level > logging.DEBUG:
+#         log.setLevel(logging.DEBUG)
+#         log.info("Debug logging activated")
+#         menu.entryconfig(1, label='Deactivate debug logging')
+#     else:
+#         log.setLevel(logging.INFO)
+#         log.info("Debug logging deactivated")
+#         menu.entryconfig(1, label='Activate debug logging')
 
 
 # Dialog für die Bewertung einer Struktur
@@ -183,6 +207,14 @@ class SeqMainFrame(Frame):
          
         # füge das Menu in die Menubar ein
         menubar.add_cascade(label="Protein",menu=protein_menu)
+
+        # # Erzeuge About-Menu mit debug log toggle
+        # about_menu = tk.Menu(menubar, tearoff=0)
+        # about_menu.add_command(
+        #     label='Activate debug logging',
+        #     command=lambda: _switch_gui_logging_level(about_menu)
+        # )
+        # menubar.add_cascade(label='About',menu=about_menu)
 
         # den Frame im Container anzeigen
         options = {'padx': 5, 'pady': 5}
