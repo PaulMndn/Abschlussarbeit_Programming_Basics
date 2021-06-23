@@ -5,11 +5,14 @@ from tkinter import messagebox
 import tkinter.scrolledtext as st
 import tkinter as tk
 from tkinter import filedialog as fd
+import logging
+import time
+import pathlib
 
 from drawing import *
 from Biologic import *
-import logging
-import time
+
+SCRIPT_DIR = pathlib.Path(".")
 
 # initiate logging
 start_time = time.strftime("%Y%m%d_%H%M%S")
@@ -21,7 +24,6 @@ logging.basicConfig(
 )
 log = logging.getLogger()
 # log.setLevel(logging.DEBUG)
-log.info("Application started.")
 
 # def _switch_gui_logging_level(menu:tk.Menu):
 #     if logging.root.level > logging.DEBUG:
@@ -352,6 +354,7 @@ class SeqMainFrame(Frame):
     
 # Hauptfunktion
 if __name__ == "__main__":
+    log.info("Application started.")
     app = App()
     # erzeuge ein biologic-Objekt und verwende dies in der App
     logic = biologic()
