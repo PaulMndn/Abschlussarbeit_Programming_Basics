@@ -1,6 +1,7 @@
 import logging
 from Bio import SeqIO, Entrez
 import pathlib
+import re
 
 import GUI
 
@@ -27,9 +28,17 @@ class biologic:
     # reverse transcription
     RNA_TO_DNA = {v: k for k,v in DNA_TO_RNA.items()}
 
+    # translation
+    START_CODON = "Met"
+    STOP_CODON = "_"
+
 
     def __init__(self):
         """TODO: modify doc string! Konstruktor. Falls nötig, können hier Voreinstellungen gemacht werden. """
+        self.dna = None
+        self.rna = None
+        self.proteins = None
+        
         # create translation table
         table_fp = GUI.SCRIPT_DIR/"data"/"genCode.txt"
         if not table_fp.exists():
@@ -136,25 +145,35 @@ class biologic:
         Returns:
             str - rna sequence
         """
+        if self.dna is None:
+            log.error('Could not transcribe DNA to RNA because DNA does not exists')
+            return
+        
         self.rna = "".join(self.DNA_TO_RNA[i] for i in self.dna)
         log.info(f'DNA transcribed to RNA: {self.rna}')
         return self.rna
 
 
-    def translate(self,initPos:int = 0):    
+    def translate(self,initPos: int = 0, reverte_rna: bool =False):    
         """ Translatiere die intern gespeicherte RNA in eine Aminosäurensequenz, ab der 
         vorgegebenen Position. Aufgabe 4
 
         Argument:
             initPos - starting position for translation
+            bool - weather RNA sequence is reversed for tranlsation
 
         Returns:
             :str: peptid sequence
         """
+        if self.rna is None:
+            log.error("Could not translate DNA because RNA does not exist")
+            return
+
+        rna = self.rna if not reverte_rna else "".join(i for i in reversed(self.rna))
         peptid = []
         log.debug(f'Start translation.')
-        for i in range(initPos, len(self.rna), 3):
-            codon = self.rna[i:i+3]
+        for i in range(initPos, len(rna), 3):
+            codon = rna[i:i+3]
             if len(codon) < 3:
                 # No complete codon left
                 continue
@@ -165,18 +184,54 @@ class biologic:
                 log.error(f'Codon {codon} not found in codon table.')
                 peptid.append(f'?({codon})')
         
-        self.protein = "".join(peptid)
-        log.info(f'Protein sequence created. {self.protein}')
-        return self.protein
+        protein = "".join(peptid)
+        log.info(f'Protein sequence created. {protein}')
+        return protein
 
 
-    def get_proteins(self, rf_number):
-       """ Erzeuge für einen vorgegebenen Leserahmen alle daraus ablesbaren Proteine. Ein Protein beginnt
-       mit 'M' und endet mit einem Stop '_'. Die Leserahmen haben die Nummern 0 bis 5. Dabei sind 0-2 die Rahmen
-       in der vorgegebenen Richtung und 3-5 die Rahmen der revertierten Sequenz. Aufgabe 5.
-       Parameter: rf_number: Nummer des Leserahmens (reading frame)
-       Ergebnis: die Liste der Proteine (Liste von Strings)
-       """
+    def get_proteins(self, rf_number) -> list[str]:
+        """ Erzeuge für einen vorgegebenen Leserahmen alle daraus ablesbaren 
+        Proteine. Ein Protein beginnt mit 'M' und endet mit einem Stop '_'. 
+        Die Leserahmen haben die Nummern 0 bis 5. Dabei sind 0-2 die 
+        Rahmen in der vorgegebenen Richtung und 3-5 die Rahmen der revertierten 
+        Sequenz. Aufgabe 5. 
+        
+        Arguments: 
+            rf_number: Nummer des Leserahmens (reading frame)
+        
+        Returnss: 
+            list of proteins
+        """
+        rf_mapping = {
+            0: (False, 0),
+            1: (False, 1),
+            2: (False, 2),
+            3: (True, 0),
+            4: (True, 1),
+            5: (True, 2)
+        }
+
+        try:
+            reversed, initPos = rf_mapping[rf_number]
+        except KeyError:
+            log.error(f'Invalid reading frame: {rf_number}. Expected valule between 0-5.')
+            return
+        
+        log.info(f"Trnaslating {'forward' if not reversed else 'reverse'} rna. "
+            + f"Starting at position {initPos}.")
+        translation = self.translate(initPos, reversed)
+        if translation is None:
+            log.error(f"RNA was not tranlsated to peptid. Can't match for proteins.")
+            return
+        
+        log.debug(f"RNA tranlsated to peptid: {translation}")
+        
+        prot_pattern = re.compile("Met[A-Za-z?\(\)]*_")
+        self.proteins = re.findall(prot_pattern, translation)
+        log.info(f"{len(self.proteins)} proteins found: {self.proteins}")
+        
+        return self.proteins
+
 
     def eval_rna(self, struct):
         """ Berechne für eine vorgegebene Struktur die Anzahl der enthaltenen Wasserstoffbrücken.
@@ -195,3 +250,9 @@ class biologic:
         """ Berechne für die zuletzt durchgeführte Faltung die optimale Struktur. Aufgabe 8.
         Ergebnis: optimale Struktur in Klammerschreibweise.
         """
+
+
+if __name__ == '__main__':
+    # teststring ArgMetCysAlaLys_AsnGluMetPhe_Met
+    # pattern "Met[A-Za-z?\(\)]*_"
+    pass
