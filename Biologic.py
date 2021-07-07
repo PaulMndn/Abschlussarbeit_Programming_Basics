@@ -11,6 +11,16 @@ def get_bonds():
     """ Gibt pro Paar die Anzahl der Wasserstoffbrücken zurück.
     Ab Aufgabe 6.
     """
+    bonds = {
+        "AU": 2,
+        "GC": 3,
+        "GU": 1
+    }
+    # add reversed pairs to dict
+    keys = list(bonds.keys())
+    for i in keys:
+        bonds["".join(reversed(i))] = bonds[i]
+    return bonds
 
 class biologic:
     ALPHABETS = {
@@ -239,6 +249,34 @@ class biologic:
         Parameter: struct: eine vorgegebene Sekundärstruktur in Klammerschreibweise.
         Ergebnis: Anzahl der Wasserstoffbrücken
         """
+        if self.rna is None:
+            log.error("No RNA sequence present to calculate bonds for.")
+            return
+        
+        log.info(f"Start bond count calculation")
+        log.debug(f"Bond count calculation with structure: {struct} on sequence: {self.rna}.")
+        bond_count = 0
+
+        # keep track of opening bracket indices
+        opening_indices = []
+        for i in range(len(struct)):
+            char = struct[i]
+            if char == ".":
+                continue
+            elif char == "(":
+                opening_indices.append(i)
+                continue
+            elif char == ")":
+                opening_index = opening_indices.pop()
+                pair = self.rna[opening_index] + self.rna[i]
+                try:
+                    bond_count += get_bonds()[pair]
+                except KeyError:
+                    log.error(f"Invalid bond {pair} in struct {struct} for RNA sequence {self.rna}.")
+                    return
+        
+        log.debug(f"Finished Calculation. Bond count: {bond_count}")
+        return bond_count
 
     def foldRna(self) :
         """ Berechne die optimale Sekundärstruktur nach dem vorgegebenen Verfahren. Aufgabe 7.
