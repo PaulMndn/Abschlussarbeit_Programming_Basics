@@ -2,7 +2,6 @@ import logging
 from Bio import SeqIO, Entrez
 import pathlib
 import re
-import copy
 
 import GUI
 
@@ -312,11 +311,8 @@ class biologic:
                 
                 # calculate max bonds from partial sub-sequences
                 partial_sequences_bonds = max(
-                    self.bond_mat[y][x-5] + self.bond_mat[y+1][x],
-                    self.bond_mat[y][x-4] + self.bond_mat[y+2][x],
-                    self.bond_mat[y][x-3] + self.bond_mat[y+3][x],
-                    self.bond_mat[y][x-2] + self.bond_mat[y+4][x],
-                    self.bond_mat[y][x-1] + self.bond_mat[y+5][x]
+                    self.bond_mat[y][k] + self.bond_mat[k+1][x] \
+                        for k in range(y,x)
                 )
 
                 # save max of first_and_last_bases_bind and 
