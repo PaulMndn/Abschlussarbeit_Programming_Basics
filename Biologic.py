@@ -2,6 +2,7 @@ import logging
 from Bio import SeqIO, Entrez
 import pathlib
 import re
+import copy
 
 import GUI
 
@@ -282,7 +283,51 @@ class biologic:
         """ Berechne die optimale Sekundärstruktur nach dem vorgegebenen Verfahren. Aufgabe 7.
         Ergebnis: die optimale Anzahl von Wasserstoffbrücken
         """
-        
+        # init zero-matrix
+        self.bond_mat = [[0 for i in self.rna] for i in self.rna]
+
+        # iterate ofer bond_mat diagonally
+        for i in range(4,len(self.rna)):
+            for j in range(0,len(self.rna)-i):
+                y,x = j, i+j
+                # calc bonds and save to bond_mat
+
+                # get first and last bases of sequence and their bonds
+                bases = self.rna[y] + self.rna[x]
+                try:
+                    bases_bonds = get_bonds()[bases]
+                except KeyError:
+                    bases_bonds = 0
+
+                # number of bonds of first and last base + inner sequence (left down)
+                first_last_bases_bonds = bases_bonds + self.bond_mat[y+1][x-1]
+                
+                if i == 4:
+                    # if first diagonal just save to matrix and continue
+                    self.bond_mat[y][x] = first_last_bases_bonds
+                    continue
+                
+                partial_sequences_bonds = max(
+                    self.bond_mat[y][x-5] + self.bond_mat[y+1][x],
+                    self.bond_mat[y][x-4] + self.bond_mat[y+2][x],
+                    self.bond_mat[y][x-3] + self.bond_mat[y+3][x],
+                    self.bond_mat[y][x-2] + self.bond_mat[y+4][x],
+                    self.bond_mat[y][x-1] + self.bond_mat[y+5][x]
+                )
+
+                self.bond_mat[y][x] = max(
+                    first_last_bases_bonds, 
+                    partial_sequences_bonds
+                )
+                
+                ## print-outs for debug
+                print(self.rna)
+                print(bases)
+                print("\n".join(str(i) for i in self.bond_mat))
+                print()
+
+        return self.bond_mat[0][-1]
+
 
    
     def trace(self) :
@@ -292,6 +337,17 @@ class biologic:
 
 
 if __name__ == '__main__':
+    #################################################
+    ## ONLY FOR DEV PURPOSES, NO EXPLICIT FUNCTION ##
+    #################################################
+    
     # teststring ArgMetCysAlaLys_AsnGluMetPhe_Met
     # pattern "Met[A-Za-z?\(\)]*_"
+
+    # bio = biologic()
+    # bio.rna = "UCGACUCGGAG"
+    # res = bio.foldRna()
+    # print("\n".join(str(i) for i in bio.bond_mat))
+
+
     pass
