@@ -14,8 +14,9 @@ from Biologic import *
 
 SCRIPT_DIR = pathlib.Path(".")
 
-# initiate logging
-start_time = time.strftime("%Y%m%d_%H%M%S")
+## initiate logging
+# start_time = time.strftime("%Y%m%d_%H%M%S")
+start_time = time.strftime("%Y%m%d")
 logging.basicConfig(
     filename=f"./log/{start_time}.log",
     encoding="utf-8",

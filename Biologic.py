@@ -282,6 +282,7 @@ class biologic:
         """ Berechne die optimale Sekundärstruktur nach dem vorgegebenen Verfahren. Aufgabe 7.
         Ergebnis: die optimale Anzahl von Wasserstoffbrücken
         """
+        
 
    
     def trace(self) :
