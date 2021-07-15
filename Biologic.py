@@ -283,8 +283,10 @@ class biologic:
         """ Berechne die optimale Sekundärstruktur nach dem vorgegebenen Verfahren. Aufgabe 7.
         Ergebnis: die optimale Anzahl von Wasserstoffbrücken
         """
+        log.debug("Start calculate max number of bonds")
         # init zero-matrix
         self.bond_mat = [[0 for i in self.rna] for i in self.rna]
+        log.debug("Finshed initializing zero matrix")
 
         # iterate ofer bond_mat diagonally
         for i in range(4,len(self.rna)):
@@ -304,9 +306,11 @@ class biologic:
                 
                 if i == 4:
                     # if first diagonal just save to matrix and continue
+                    # no sub-sequences possible (primary priximity contraint)
                     self.bond_mat[y][x] = first_last_bases_bonds
                     continue
                 
+                # calculate max bonds from partial sub-sequences
                 partial_sequences_bonds = max(
                     self.bond_mat[y][x-5] + self.bond_mat[y+1][x],
                     self.bond_mat[y][x-4] + self.bond_mat[y+2][x],
@@ -315,17 +319,26 @@ class biologic:
                     self.bond_mat[y][x-1] + self.bond_mat[y+5][x]
                 )
 
+                # save max of first_and_last_bases_bind and 
+                # partial_sub-sequences in bond_mat
                 self.bond_mat[y][x] = max(
                     first_last_bases_bonds, 
                     partial_sequences_bonds
                 )
                 
                 ## print-outs for debug
-                print(self.rna)
-                print(bases)
-                print("\n".join(str(i) for i in self.bond_mat))
-                print()
+                # print(self.rna)
+                # print(bases)
+                # print("\n".join(str(i) for i in self.bond_mat))
+                # print()
+        
+        log.debug(f"Finished creating bond matrix.")
+        log.debug(str(self.bond_mat))
 
+        log.info("Matrix of bonds of (sub)sequences calculated.")
+        log.info(f"Max number of bonds for RNA sequence {self.rna}"
+            + f"calculated to be {self.bond_mat[0][-1]}")
+        
         return self.bond_mat[0][-1]
 
 
@@ -340,7 +353,7 @@ if __name__ == '__main__':
     #################################################
     ## ONLY FOR DEV PURPOSES, NO EXPLICIT FUNCTION ##
     #################################################
-    
+
     # teststring ArgMetCysAlaLys_AsnGluMetPhe_Met
     # pattern "Met[A-Za-z?\(\)]*_"
 
