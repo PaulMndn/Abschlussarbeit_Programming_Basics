@@ -21,7 +21,9 @@ def test_foldRna():
     assert bio.bond_mat == expect_mat
     assert res_bonds == expect_mat[0][-1]
 
-    
+    assert bio.trace() == "..(..(...))"
+
+
 
 def test_foldRna_2():
     bio = Biologic.biologic()
@@ -43,4 +45,6 @@ def test_foldRna_2():
     print(i for i in bio.bond_mat)
     assert bio.bond_mat == expect_mat
     assert res_bonds == expect_mat[0][-1]
+
+    assert bio.trace() == "(((...).))."
 
