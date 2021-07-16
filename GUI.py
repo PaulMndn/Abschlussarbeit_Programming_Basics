@@ -15,16 +15,23 @@ from Biologic import *
 SCRIPT_DIR = pathlib.Path(".")
 
 ## initiate logging
-# start_time = time.strftime("%Y%m%d_%H%M%S")
-start_time = time.strftime("%Y%m%d")
+START_TIME = time.strftime("%Y%m%d_%H%M%S")
+# START_TIME = time.strftime("%Y%m%d")
 logging.basicConfig(
-    filename=f"./log/{start_time}.log",
+    filename=f"./log/{START_TIME}.log",
     encoding="utf-8",
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)s - %(name)s: %(message)s"
 )
 log = logging.getLogger()
 # log.setLevel(logging.DEBUG)
+
+def open_log_file():
+    "Open current log-file."
+    import os
+    os.startfile(SCRIPT_DIR/"log"/f"{START_TIME}.log")
+
+
 
 # def _switch_gui_logging_level(menu:tk.Menu):
 #     if logging.root.level > logging.DEBUG:
@@ -233,13 +240,12 @@ class SeqMainFrame(Frame):
         # füge das Menu in die Menubar ein
         menubar.add_cascade(label="Protein",menu=protein_menu)
 
-        # # Erzeuge About-Menu mit debug log toggle
-        # about_menu = tk.Menu(menubar, tearoff=0)
-        # about_menu.add_command(
-        #     label='Activate debug logging',
-        #     command=lambda: _switch_gui_logging_level(about_menu)
-        # )
-        # menubar.add_cascade(label='About',menu=about_menu)
+        # Erzeuge About-Menu mit open_log_file
+        about_menu = tk.Menu(menubar, tearoff=0)
+        about_menu.add_command(label='Open log-file',command=open_log_file)
+        about_menu.add_separator()
+        about_menu.add_command(label="by Paul Menden", state="disabled")
+        menubar.add_cascade(label='About',menu=about_menu)
 
         # den Frame im Container anzeigen
         options = {'padx': 5, 'pady': 5}
@@ -377,7 +383,13 @@ class SeqMainFrame(Frame):
     
 # Hauptfunktion
 if __name__ == "__main__":
-    log.info("Application started.")
+    log.info('''
+    ###########################################################
+    #################   Application started   #################
+    ###########################################################''')
+    # log.info(f"Logging level: {logging.getLevelName(log.level)}")
+    log.log(level=log.level, msg=f"Logging level: {logging.getLevelName(log.level)}")
+
     app = App()
     # erzeuge ein biologic-Objekt und verwende dies in der App
     logic = biologic()
