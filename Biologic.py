@@ -338,11 +338,46 @@ class biologic:
         return self.bond_mat[0][-1]
 
 
+
+    def struct_string(self,x,y):
+        bonds = self.bond_mat[y][x]
+        try:
+            base_bonds = get_bonds()[self.rna[x]+self.rna[y]]
+        except KeyError:
+            base_bonds = None
+
+        if bonds == 0:
+            # no bonds from bases on pos x to y
+            return "." * (abs(y-x)+1)
+        
+        if bonds == self.bond_mat[y+1][x]:
+            return "." + self.struct_string(x,y+1)
+        
+        if base_bonds is not None and bonds == (self.bond_mat[y+1][x-1] + base_bonds):
+            return f"({self.struct_string(x-1, y+1)})"
+        
+        for k in range(y, x):
+            if bonds == (
+                self.bond_mat[y][k]
+                + self.bond_mat[k+1][x]
+            ):
+                return self.struct_string(k,y) + self.struct_string(x, k+1)
+        
+        log.error("None of the possible tracing options for finding a "
+            + "binding structure yielded a result.")
+        
+        raise Exception("None of the possible tracing options yielded a result.")
    
     def trace(self) :
         """ Berechne für die zuletzt durchgeführte Faltung die optimale Struktur. Aufgabe 8.
         Ergebnis: optimale Struktur in Klammerschreibweise.
         """
+        log.debug(f"Start calculating structural string for RNA {self.rna}.")
+        
+        # start tracing bonds in bonding matrix
+        binding_structure = self.struct_string(len(self.rna)-1, 0)
+
+        return binding_structure
 
 
 if __name__ == '__main__':
