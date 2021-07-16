@@ -10,6 +10,7 @@ def test_set_dna():
     bio.set_dna("AGTTCTAGGCGCCATACAAGATA")
     assert bio.dna == "AGTTCTAGGCGCCATACAAGATA"
 
+
 def test_validate_dna():
     bio = Biologic.biologic()
     bio.set_dna("AGTTCTAGGCGCCATAC")
@@ -21,6 +22,7 @@ def test_validate_dna():
     bio.set_dna("ACTCCTUGTAGGTCA")
     assert bio.validate_dna() == False
 
+
 def test_get_rna():
     bio = Biologic.biologic()
     bio.set_dna("AGTTCTAGGCGCCATACAAGATA")
@@ -29,11 +31,13 @@ def test_get_rna():
     # internally saved RNA is equal to returned RNA
     assert rna == bio.rna
 
+
 def test_read_fasta_file():
     bio = Biologic.biologic()
     bio.read_fasta_file(str(GUI.SCRIPT_DIR/"data"/"blue_pigment.fasta"))
 
     assert bio.dna == "ATGGTCAACAACCGTAACCATGGGCTGGACTTACGGCTTGTCACCATTCCTTCATTCTTCTCCAAGAGTGCTTGCATCTACAATCCCATCATCTACTGCTTCATGAATGTAAAGCTCT"
+
 
 def test_read_from_ncbi():
     bio = Biologic.biologic()
@@ -41,11 +45,13 @@ def test_read_from_ncbi():
 
     assert bio.dna == "ATGGTCAACAACCGTAACCATGGGCTGGACTTACGGCTTGTCACCATTCCTTCATTCTTCTCCAAGAGTGCTTGCATCTACAATCCCATCATCTACTGCTTCATGAATGTAAAGCTCT"
 
+
 def test_transcription():
     bio = Biologic.biologic()
     bio.set_dna("AGTTCTAGGCGCCATACAAGATA")
     transcript = bio.transcribe()
     assert transcript == "UCAAGAUCCGCGGUAUGUUCUAU"
+
 
 def test_tralslation():
     bio = Biologic.biologic()
@@ -58,6 +64,7 @@ def test_tralslation():
 
     prot = bio.translate(15)
     assert prot == "Val"
+
 
 def test_get_proteins():
     bio = Biologic.biologic()
@@ -72,19 +79,19 @@ def test_get_proteins():
     proteins = bio.get_proteins(1)
     assert proteins == ["MetArg_", "Met_"]
 
+
 def test_eval_rna():
     bio = Biologic.biologic()
     bio.rna = "UUUCAGUAGCA"
     bonds = bio.eval_rna("..(..(...))")
     assert bonds == 5
 
+
 def test_eval_rna_2():
     bio = Biologic.biologic()
     bio.rna = "UCGACUCGGAG"
     bonds = bio.eval_rna("(((...).)).")
     assert bonds == 8
-
-
 
 
 def test_foldRna():
@@ -108,7 +115,6 @@ def test_foldRna():
     assert res_bonds == expect_mat[0][-1]
 
     assert bio.trace() == "..(..(...))"
-
 
 
 def test_foldRna_2():
